@@ -1,21 +1,27 @@
-// server.js
 const express = require('express');
 const app = express();
-
-let deltaTarget = 12345.67; // valor inicial
-
-app.get('/api/delta', (req, res) => {
-  res.json({ deltaTarget });
-});
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.post('/api/delta', (req, res) => {
-  if (req.body.deltaTarget !== undefined) {
-    deltaTarget = req.body.deltaTarget;
-    return res.json({ success: true, deltaTarget });
-  }
-  res.status(400).json({ success: false, message: 'deltaTarget não fornecido' });
+
+let dadosDoSite = {};
+
+// Rota para receber dados do site
+app.post('/enviar-dados', (req, res) => {
+  dadosDoSite = req.body;
+  console.log('Dados recebidos do site:', dadosDoSite);
+  res.json({ status: 'Dados recebidos com sucesso!' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`API rodando na porta ${PORT}`));
+// Rota para o robô buscar dados
+app.get('/buscar-dados', (req, res) => {
+  res.json(dadosDoSite);
+});
+
+app.get('/', (req, res) => {
+  res.send('API Node.js está rodando com sucesso.');
+});
+
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
+});
